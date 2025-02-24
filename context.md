@@ -1,7 +1,7 @@
 # **Comprehensive Report: AI-Powered E-Commerce Aggregator App**
 
 ## **1. Overview**
-Your app is an **AI-powered shopping assistant** designed to revolutionize online shopping by aggregating, analyzing, and optimizing product searches across multiple e-commerce platforms. It functions as a **"Perplexity for Shopping"**, using AI agents to retrieve and compare product data, monitor price trends, and enhance the user experience with smart shopping tools.
+This is an **AI-powered shopping assistant** designed to revolutionize online shopping by aggregating, analyzing, and optimizing product searches across multiple e-commerce platforms. It functions as a **"Perplexity for Shopping"**, using AI agents to retrieve and compare product data, monitor price trends, and enhance the user experience with smart shopping tools.
 
 ### **Key Objectives**
 - Provide a **one-stop comparison tool** for products across multiple e-commerce platforms.
@@ -141,7 +141,7 @@ Your app is an **AI-powered shopping assistant** designed to revolutionize onlin
 ---
 
 ## **8. Conclusion**
-Your AI-powered e-commerce aggregator **disrupts online shopping** by leveraging AI to provide users with the most comprehensive, personalized, and intelligent shopping experience available today. 
+This AI-powered e-commerce aggregator **disrupts online shopping** by leveraging AI to provide users with the most comprehensive, personalized, and intelligent shopping experience available today. 
 
 ### **Why This App is a Game Changer**
 ✔ **First-of-its-kind cross-platform carting**  
