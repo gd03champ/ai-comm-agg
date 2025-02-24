@@ -1,74 +1,110 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
+import React, { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { SearchBar } from '@/components/SearchBar';
+import { ProductList } from '@/components/ProductList';
+import { ProductWebView } from '@/components/ProductWebView';
 import { ThemedView } from '@/components/ThemedView';
 
+interface Product {
+  title: string;
+  price: number;
+  imageUrl?: string;
+  rating?: number;
+  reviews?: number;
+  platform: string;
+}
+
 export default function HomeScreen() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | undefined>();
+  const [webViewUrl, setWebViewUrl] = useState<string | null>(null);
+
+  const handleSearch = async (query: string, platform: string) => {
+    setIsLoading(true);
+    setError(undefined);
+    setProducts([]);
+
+    try {
+      // Get search URL from backend
+      const response = await fetch('http://localhost:8000/api/v1/products/search-links', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query,
+          platform,
+          page: 1,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get search URL');
+      }
+
+      const data = await response.json();
+      if (data.links && data.links.length > 0) {
+        setWebViewUrl(data.links[0].search_url);
+      } else {
+        throw new Error('No search URL found');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      setIsLoading(false);
+    }
+  };
+
+  const handleProductData = (data: Product[]) => {
+    setProducts(data);
+    setIsLoading(false);
+    setWebViewUrl(null); // Hide WebView after data is extracted
+  };
+
+  const handleWebViewError = (errorMessage: string) => {
+    setError(errorMessage);
+    setIsLoading(false);
+    setWebViewUrl(null);
+  };
+
+  const handleProductPress = (product: Product) => {
+    // TODO: Navigate to product detail screen
+    console.log('Product pressed:', product);
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <ThemedView style={styles.container}>
+      <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+      
+      {webViewUrl ? (
+        <View style={styles.webviewContainer}>
+          <ProductWebView
+            url={webViewUrl}
+            onProductData={handleProductData}
+            onError={handleWebViewError}
+          />
+        </View>
+      ) : (
+        <ProductList
+          products={products}
+          isLoading={isLoading}
+          error={error}
+          onProductPress={handleProductPress}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      )}
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  webviewContainer: {
+    flex: 1,
+    opacity: 0, // Hide WebView but keep it functional
     position: 'absolute',
+    width: '100%',
+    height: '100%',
   },
 });
